@@ -20,6 +20,15 @@ services:
       - 8083:8083
     networks:
       - dice
+  nginx: 
+    image: dicenginx
+    container_name: dicenginx
+    depends_on:
+      - diceapi
+    ports:
+      - 80:80
+    networks:
+      - dice
 networks:
   dice:
     driver: bridge

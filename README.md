@@ -4,7 +4,7 @@ Dice Relative Distribution Project
 # Application 
   - Run the `start.sh` script to run the application. Note that you should have docker installed in your machine.
 
-  - Once running, you may access the application swagger ui in **http://localhost:8083** 
+  - Once running, you may access the application swagger ui in **http://localhost:8083/dice-api/swagger-ui.html** 
 
 # MongoDB
   - Access the mongodb using a client with the exposed port 27107.
