@@ -9,4 +9,6 @@ import com.simulation.dice.exceptions.DiceApiException;
 public interface AggregateSimulationRepository  {
 	
 	List<SimulationAggregation> findAggregate() throws  DiceApiException;
+
+	SimulationAggregation findAggregateByDiceAndSide(int dice, int side) throws DiceApiException;
 }

@@ -53,24 +53,7 @@ public class SimulationServiceImpl implements SimulationService {
 		List<SimulationAggregationResponseWrapper> responseWrappers = new ArrayList<SimulationAggregationResponseWrapper>();
 		try {
 		for (SimulationAggregation simAggregation : simulationAggregations) {
-			SimulationAggregationResponseWrapper responseWrapper = SimulationAggregationResponseWrapper.builder()
-					.max(simAggregation.getDice() * simAggregation.getSides()).rolls(simAggregation.getRolls())
-					.sides(simAggregation.getSides()).dice(simAggregation.getDice()).build();
-			Map<Integer, AtomicInteger> sumOfMaps = new ConcurrentHashMap<Integer, AtomicInteger>();
-			for (int i = 0; i < simAggregation.getRollsCounts().size(); i++) {
-				for (int j = 1; j <= simAggregation.getDice() * simAggregation.getSides(); j++) {
-					sumOfMaps.putIfAbsent(j, new AtomicInteger(0));
-					Map<Integer, AtomicInteger> aggregate = simAggregation.getRollsCounts().get(i);
-					aggregate.putIfAbsent(j, new AtomicInteger(0));
-					AtomicInteger value = aggregate.get(j);
-					sumOfMaps.get(j).addAndGet(value.get());
-				}
-				sumOfMaps.values().removeIf(f -> f.intValue() == 0);
-			}
-			Map<Integer, Float> percentage = new ConcurrentHashMap<Integer, Float>();
-			sumOfMaps.entrySet().stream()
-		      .forEach(e -> percentage.put(e.getKey(), (e.getValue().floatValue()/simAggregation.getRolls()) * 100));
-			responseWrapper.setRelativeDistribution(percentage);
+			SimulationAggregationResponseWrapper responseWrapper = computeRelativeDistribution(simAggregation);
 			responseWrappers.add(responseWrapper);
 		}
 		}catch(Exception e) {
@@ -91,5 +74,41 @@ public class SimulationServiceImpl implements SimulationService {
 		}
 		return simulation;
 	}
+
+	@Override
+	public SimulationAggregationResponseWrapper findAggregateByDiceAndSides(int dice, int sides) throws Exception {
+		return computeRelativeDistribution(aggregateSimulation.findAggregateByDiceAndSide(dice, sides));
+	}
+	
+	
+	private SimulationAggregationResponseWrapper computeRelativeDistribution(
+			SimulationAggregation simAggregation) {
+		SimulationAggregationResponseWrapper responseWrapper = new SimulationAggregationResponseWrapper();
+		try {
+			 responseWrapper = SimulationAggregationResponseWrapper.builder()
+					.max(simAggregation.getDice() * simAggregation.getSides()).rolls(simAggregation.getRolls())
+					.sides(simAggregation.getSides()).dice(simAggregation.getDice()).build();
+			Map<Integer, AtomicInteger> sumOfMaps = new ConcurrentHashMap<Integer, AtomicInteger>();
+			for (int i = 0; i < simAggregation.getRollsCounts().size(); i++) {
+				for (int j = 1; j <= simAggregation.getDice() * simAggregation.getSides(); j++) {
+					sumOfMaps.putIfAbsent(j, new AtomicInteger(0));
+					Map<Integer, AtomicInteger> aggregate = simAggregation.getRollsCounts().get(i);
+					aggregate.putIfAbsent(j, new AtomicInteger(0));
+					AtomicInteger value = aggregate.get(j);
+					sumOfMaps.get(j).addAndGet(value.get());
+				}
+				sumOfMaps.values().removeIf(f -> f.intValue() == 0);
+			}
+			Map<Integer, Float> percentage = new ConcurrentHashMap<Integer, Float>();
+			sumOfMaps.entrySet().stream()
+		      .forEach(e -> percentage.put(e.getKey(), (e.getValue().floatValue()/simAggregation.getRolls()) * 100));
+			responseWrapper.setRelativeDistribution(percentage);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+
+		return responseWrapper;
+	}
+
 
 }

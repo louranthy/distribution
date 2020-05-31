@@ -105,4 +105,15 @@ public class DiceSimulationRest {
 				.result(SimulationStatus.SUCCESS.getValue()).simulationDate(new Date()).build();
 
 	}
+	
+	@GetMapping("/getAggregatesByDiceAndSides/")
+	ResponseEntity<SimulationAggregationResponseWrapper> getAggregatesByDiceAndSides(@RequestParam @Min(1) int dice, @RequestParam @Min(4) int sides) {
+		SimulationAggregationResponseWrapper simulation = new SimulationAggregationResponseWrapper();
+		try {
+			simulation = simulationService.findAggregateByDiceAndSides(dice, sides);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(simulation);
+		}
+		return ResponseEntity.ok().body(simulation);
+	}
 }
