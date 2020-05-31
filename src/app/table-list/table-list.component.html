@@ -1,0 +1,101 @@
+<div class="main-content">
+        <div class="row"> 
+                <div class="col-lg-12 col-md-4 col-sm-4">
+                       <h3>  Simulate</h3>
+                    </div>
+                </div>
+        <form [formGroup]="simulateForm" (ngSubmit)="onSubmit()">
+                <div class="form-row">
+                    <div class="form-group col-4">
+                        <label>Number of Dice</label>
+                        <select id="slctdice" name="slct" formControlName="numDice" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.numDice.errors }">
+                        </select>
+                        <div *ngIf="submitted && f.numDice.errors" class="invalid-feedback">
+                            <div *ngIf="f.numDice.errors.required">Number of Dice is required</div>
+                            <div *ngIf="f.numDice.errors.min">Number of Dice should be greater than 0</div>
+                        </div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label>Number of Sides</label>
+                        <select id="slctside" name="slct" formControlName="numSides" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.numSides.errors }">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                            <option value="20">20</option>
+                            <option value="100">100</option>
+                        </select>
+                        <div *ngIf="submitted && f.numSides.errors" class="invalid-feedback">
+                            <div *ngIf="f.numSides.errors.required">Number of Sides is required</div>
+                            <div *ngIf="f.numSides.errors.min">Number of Sides should be greater than 0</div>
+                        </div>
+                    </div>
+                    <div class="form-group col-4">
+                        <label>Number of Rolls</label>
+                        <input type="text" formControlName="numRolls" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.numRolls.errors }" value="0" />
+                        <div *ngIf="submitted && f.numRolls.errors" class="invalid-feedback">
+                            <div *ngIf="f.numRolls.errors.required">Number of Rolls is required</div>
+                            <div *ngIf="f.numRolls.errors.min">Number of Rolls should be greater than 0</div>
+                        </div>
+                    </div>
+                </div>
+ 
+                <div class="text-center">
+                    <button class="btn btn-primary mr-1 btn-danger">Simulate</button>
+                    <button class="btn btn-secondary" type="reset" (click)="onReset()">Cancel</button>
+                </div>
+            </form>
+  <div class="container-fluid">
+      <div class="row">
+          <div class="col-md-12">
+              <div class="card">
+                  <div class="card-header card-header-danger">
+                      <h4 class="card-title ">Simulations</h4>
+                      <p class="card-category"> Display all Simulations</p>
+                  </div>
+                  <div class="card-body">
+                      <div class="table-responsive">
+                          <table #simDataTable class="table" id="simTable"></table>
+                      </div>
+                  </div>
+              </div>
+            
+          </div>
+          <div class="col-md-12">
+              <div class="card">
+                  <div class="card-header card-header-danger">
+                      <h4 class="card-title ">Aggregates</h4>
+                      <p class="card-category"> Display all Relative Distributions</p>
+                  </div>
+                  <div class="card-body">
+                      <div class="table-responsive">
+                          <table #aggregateDataTable class="table" id="aggregateDataTable"></table>
+                      </div>
+                  </div>
+              </div>
+            
+          </div>
+          
+      </div>
+  </div>
+</div>
+<div id="simModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 id="modalTitle"></h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p>Modal body text goes here.</p>
+            
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+      </div>
+    </div>
+  </div>
