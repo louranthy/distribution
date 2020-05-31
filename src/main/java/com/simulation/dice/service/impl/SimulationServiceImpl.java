@@ -54,7 +54,8 @@ public class SimulationServiceImpl implements SimulationService {
 		try {
 		for (SimulationAggregation simAggregation : simulationAggregations) {
 			SimulationAggregationResponseWrapper responseWrapper = SimulationAggregationResponseWrapper.builder()
-					.max(simAggregation.getDice() * simAggregation.getSides()).rolls(simAggregation.getRolls()).build();
+					.max(simAggregation.getDice() * simAggregation.getSides()).rolls(simAggregation.getRolls())
+					.sides(simAggregation.getSides()).dice(simAggregation.getDice()).build();
 			Map<Integer, AtomicInteger> sumOfMaps = new ConcurrentHashMap<Integer, AtomicInteger>();
 			for (int i = 0; i < simAggregation.getRollsCounts().size(); i++) {
 				for (int j = 1; j <= simAggregation.getDice() * simAggregation.getSides(); j++) {
@@ -77,6 +78,18 @@ public class SimulationServiceImpl implements SimulationService {
 		}
 
 		return responseWrappers;
+	}
+
+	@Override
+	public Simulation findById(String id) {
+		Simulation simulation = new Simulation();
+		try {
+			simulation = simulationRepository.findById(id).get();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return simulation;
 	}
 
 }

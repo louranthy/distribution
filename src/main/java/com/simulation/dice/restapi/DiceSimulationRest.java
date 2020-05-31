@@ -75,6 +75,17 @@ public class DiceSimulationRest {
 		}
 		return ResponseEntity.ok().body(simulations);
 	}
+	
+	@GetMapping("/getSimulationById/")
+	ResponseEntity<Simulation> getAllSimulationById(@RequestParam String id) {
+		Simulation simulation = new Simulation();
+		try {
+			simulation = simulationService.findById(id);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(simulation);
+		}
+		return ResponseEntity.ok().body(simulation);
+	}
 
 	@GetMapping("/getAggregates/")
 	ResponseEntity<List<SimulationAggregationResponseWrapper>> getAggregates() {

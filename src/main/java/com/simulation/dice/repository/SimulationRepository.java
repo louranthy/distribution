@@ -13,4 +13,5 @@ public interface SimulationRepository extends MongoRepository<Simulation, String
 
 	Optional<Simulation> findById(String id);
 	List<Simulation> findAll();
+	Simulation findById();
 }

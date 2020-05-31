@@ -11,4 +11,5 @@ public interface SimulationService  {
 	public void saveSimulationResult(Simulation simulation);
 	public List<Simulation> getAllSimulations();
 	public List<SimulationAggregationResponseWrapper> findAggregate() throws Exception;
+	Simulation findById(String id);
 }

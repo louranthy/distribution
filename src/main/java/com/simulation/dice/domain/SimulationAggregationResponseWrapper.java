@@ -1,7 +1,6 @@
 package com.simulation.dice.domain;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -21,6 +20,8 @@ public class SimulationAggregationResponseWrapper {
 
 	private int rolls;
 	private int max;
+	private int dice;
+	private int sides;
 	private Map<Integer, Float> relativeDistribution;
 
 }
