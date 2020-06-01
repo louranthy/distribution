@@ -1,6 +1,8 @@
 export class DiceDistribution {
     simulationStatus: String;
-    simulation : {};
+    simulation : {
+        rollsCount : Map<String, Number>;
+    };
     validationMessages: {};
 
 }

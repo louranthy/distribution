@@ -4,8 +4,8 @@ import { Subject } from 'rxjs';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { DiceDistribution } from 'app/model/DiceDistribution';
-import { DatePipe } from '@angular/common';
-
+import { DatePipe, NgSwitchDefault } from '@angular/common';
+import Swal from 'sweetalert2'
 @Component({
   selector: 'app-table-list',
   templateUrl: './table-list.component.html',
@@ -26,10 +26,13 @@ export class TableListComponent implements OnInit, OnDestroy {
   public dtTrigger: Subject<any> = new Subject();
   @ViewChild('simDataTable', { static: true }) simTable;
   @ViewChild('aggregateDataTable', { static: true }) aggregateTable;
+
   constructor(private diceapiService: DiceapiService,
     private router: Router, private formBuilder: FormBuilder,
     private datePipe : DatePipe) { }
  that = this;
+
+ 
   ngOnInit() {
    
 
@@ -38,9 +41,6 @@ export class TableListComponent implements OnInit, OnDestroy {
       numSides: ['', [Validators.min(1), Validators.required]],
       numRolls: ['', [Validators.min(1), Validators.required]]
     });
-    this.simulateForm.value.numRolls = 0;
-    this.simulateForm.value.numSides = 0;
-    this.simulateForm.value.numDice = 0;
     var select = jQuery("#slctdice");
     var i = 0;
     for (i = 1; i <= 100; i++) {
@@ -68,17 +68,74 @@ export class TableListComponent implements OnInit, OnDestroy {
   get f() { return this.simulateForm.controls; }
 
   onSubmit() {
+    var that = this;
     this.submitted = true;
     if (this.simulateForm.invalid) {
       return;
     }
-    this.diceapiService.simulate(this.simulateForm.value.numDice, this.simulateForm.value.numRolls, this.simulateForm.value.numSides).subscribe(data => {
-      this.diceDistribution = data;
-      this.simDataTable.DataTable().destroy();
-      this.aggregateDataTable.DataTable().destroy();
-      this.getAllSimulationsFromSource();
-      this.getAllAggregates();
-    });
+    Swal.fire({
+      title: 'Simulate the following?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Simulate!',
+      cancelButtonText: 'Cancel',
+      html:
+      'Dice :  ' + this.simulateForm.value.numDice +
+      '<p>Sides : ' + this.simulateForm.value.numSides + '</p>'  +
+      '<p>Rolls : ' + this.simulateForm.value.numRolls + '</p>' 
+    }).then((result) => {
+      if (result.value) {
+        this.diceapiService.simulate(this.simulateForm.value.numDice, this.simulateForm.value.numRolls, this.simulateForm.value.numSides).subscribe(data => {
+          this.diceDistribution = data;
+          var tr = "";
+          var html = ""
+          var simMap = new Map();
+          simMap = this.diceDistribution.simulation.rollsCount;
+          console.log(simMap);
+
+          if (data.simulationStatus == "SUCCESS") {
+            console.log(simMap)
+            Object.keys(simMap).forEach(function (key) {
+              tr += '<tr><td>' + key + '</td><td>' + simMap[key] + '</td></tr>';
+            });
+            console.log(tr);
+            html = '  <div class="row"> <div class="col-lg-12"><div class="card card-chart">' +
+              '<div class="card-body "><div class="table-responsive " >' +
+              '<table >' +
+              '  <tr><th>SUM</th><th>ROLLS PER SUM</th></tr>' +
+              ' </thead><tbody>' + tr +
+              '</tbody>  </table>  </div></div></div></div></div>';
+          }else{
+            Object.keys(this.diceDistribution.validationMessages).forEach(function (key) {
+              tr += '<tr><td>' + key + '</td><td>' + this.diceDistribution.validationMessages[key] + '</td></tr>';
+            });
+            html = '  <div class="row"> <div class="col-lg-12"><div class="card card-chart">' +
+              '<div class="card-body swalTableDiv""><div class="table-responsive swalTableDiv"" id="swalTableDiv" >' +
+              '<table>' +
+              '  <tr><th>PROPERTY</th><th>ERROR MESSAGE</th></tr>' +
+              ' </thead><tbody>' + tr +
+              '</tbody>  </table>  </div></div></div></div></div>';
+          }
+      
+          Swal.fire({
+            title : 'Simulated!',
+            icon : 'success',
+            confirmButtonText: 'OK',
+            html: html
+          }
+          )
+         
+          this.simDataTable.DataTable().destroy();
+          this.aggregateDataTable.DataTable().destroy();
+          this.getAllSimulationsFromSource();
+          this.getAllAggregates();
+        });
+        console.log(this.diceDistribution);
+      
+      
+      } 
+    })
+    
   }
 
   onReset() {
